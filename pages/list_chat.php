@@ -40,14 +40,26 @@ if (isset($_SESSION['username'])) {
     <title>User List</title>
     <style>
         .user-list-container {
-            background-color: #fff;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            padding: 20px;
-            max-width: 600px;
-            width: 100%;
+            width: 45%;
             box-sizing: border-box;
-            margin-top: 46px;
-            margin-right: auto;
+            padding: 0 20px;
+        }
+
+        .box-chat {
+            width: 50%;
+            min-height: 600px;
+            height: 100%;
+            box-sizing: border-box;
+            padding: 20px;
+            margin-left: 3rem;
+            position: -webkit-sticky;
+            position: sticky;
+            bottom: 15px;
+            display: flex;
+            flex-flow: column;
+            border-radius: 16px;
+            border: 1px solid black;
+            box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
         }
 
         h2 {
@@ -60,6 +72,7 @@ if (isset($_SESSION['username'])) {
             border-radius: 8px;
             padding: 10px;
             margin-bottom: 10px;
+            display: flex;
         }
 
         .user-avatar img {
@@ -71,55 +84,99 @@ if (isset($_SESSION['username'])) {
 
         .user-info {
             margin-left: 10px;
-            display: inline-block;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .follow-btn {
+            margin-top: 10px;
+        }
+
+        #box-chat--header {
+            height: 60px;
+            width: 100%;
+            background-color: #fff;
+            padding: 8px;
+            border: 1px solid gray;
+            border-radius: 16px;
+        }
+
+        #box-chat--body {
+            margin-top: 10px;
+            height: 100%;
+            width: 100%;
+            padding: 30px;
+            min-height: 480px;
+            background-color: #fff;
+            border: 1px solid gray;
+            border-radius: 16px;
+        }
+
+        .chat-text {
+            border: 1px solid gray;
+
         }
     </style>
+
 </head>
 
 <body>
+    <div style="display:flex;width:100%;height:100%;margin-top:46px;align-items:flex-end;">
+        <div class="user-list-container">
+            <h2>User List</h2>
+            <form method="GET" action="find_users.php">
+                <label for="search">Search Users:</label>
+                <input type="text" id="search" name="search" placeholder="Enter username">
+                <button type="submit">Search</button>
+            </form>
+            <br>
 
-    <div class="user-list-container">
-        <h2>User List</h2>
-        <form method="GET" action="find_users.php">
-            <label for="search">Search Users:</label>
-            <input type="text" id="search" name="search" placeholder="Enter username">
-            <button type="submit">Search</button>
-        </form>
-        </br>
-        <?php
-        if ($result && $result->num_rows > 0) {
-            while ($row = $result->fetch_assoc()) {
-                $userId = $row["UserID"];
-                $isFollowing = in_array($userId, $followerUsers);
-                ?>
-                <div class="user-card">
-                    <div class="user-avatar">
-                        <img src="<?php echo $row["AvatarURL"]; ?>" alt="User Avatar">
+            <?php
+            if ($result && $result->num_rows > 0) {
+                while ($row = $result->fetch_assoc()) {
+                    $userId = $row["UserID"];
+                    $isFollowing = in_array($userId, $followerUsers);
+                    ?>
+                    <div class="user-card">
+                        <div class="user-avatar">
+                            <img src="<?php echo $row["AvatarURL"]; ?>" alt="User Avatar">
+                        </div>
+                        <div class="user-info">
+                            <div><strong>Username:</strong>
+                                <?php echo $row["Username"]; ?>
+                            </div>
+                            <div><strong>Email:</strong>
+                                <?php echo $row["Email"]; ?>
+                            </div>
+                            <div><strong>Full Name:</strong>
+                                <?php echo $row["FullName"]; ?>
+                            </div>
+                            <button id="follow-btn-<?php echo $userId; ?>" class="follow-btn"
+                                onclick="followUser(<?php echo $userId; ?>)">Chat</button>
+                        </div>
                     </div>
-                    <div class="user-info">
-                        <div><strong>Username:</strong>
-                            <?php echo $row["Username"]; ?>
-                        </div>
-                        <div><strong>Email:</strong>
-                            <?php echo $row["Email"]; ?>
-                        </div>
-                        <div><strong>Full Name:</strong>
-                            <?php echo $row["FullName"]; ?>
-                        </div>
-                        <button id="follow-btn-<?php echo $userId; ?>" class="follow-btn"
-                            onclick="followUser(<?php echo $userId; ?>)">Chat</button>
-                    </div>
-                </div>
-                <?php
+                    <?php
+                }
+            } else {
+                echo "No users found.";
             }
-        } else {
-            echo "No users found.";
-        }
-        ?>
+            ?>
+        </div>
 
+        <div class="box-chat">
+            <div id="box-chat--header">
+                USERNAME
+            </div>
+            <div id="box-chat--body">
+                <p class="chat-text">
+                    CONTENT
+                </p>
+            </div>
+
+        </div>
     </div>
-
 </body>
+
 
 </html>
 <script>
