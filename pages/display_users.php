@@ -1,33 +1,32 @@
 <?php
 include("./includes/db.php");
-if (isset($_SESSION['username']))
-{
-$username = $_SESSION['username'];
-// Fetch all users from the database
-$sql = "SELECT * FROM users WHERE username != '$username'";
-$result = $conn->query($sql);
+if (isset($_SESSION['username'])) {
+    $username = $_SESSION['username'];
+    // Fetch all users from the database
+    $sql = "SELECT * FROM users WHERE username != '$username'";
+    $result = $conn->query($sql);
 
-// Fetch the list of users that the logged-in user is already following
-$loggedInUserId = $_SESSION["user_id"];
-$followerQuery = "SELECT FollowerID FROM follows WHERE FollowingID = $loggedInUserId";
-$followerResult = $conn->query($followerQuery);
-$followerUsers = [];
+    // Fetch the list of users that the logged-in user is already following
+    $loggedInUserId = $_SESSION["user_id"];
+    $followerQuery = "SELECT FollowerID FROM follows WHERE FollowingID = $loggedInUserId";
+    $followerResult = $conn->query($followerQuery);
+    $followerUsers = [];
 
-if ($followerResult && $followerResult->num_rows > 0) {
-    while ($followerRow = $followerResult->fetch_assoc()) {
-        $followerUsers[] = $followerRow["FollowerID"];
+    if ($followerResult && $followerResult->num_rows > 0) {
+        while ($followerRow = $followerResult->fetch_assoc()) {
+            $followerUsers[] = $followerRow["FollowerID"];
+        }
     }
-}
-}
-else {
+} else {
     $sql = "SELECT * FROM users";
-$result = $conn->query($sql);
-$followerUsers = [];
+    $result = $conn->query($sql);
+    $followerUsers = [];
 }
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -40,9 +39,9 @@ $followerUsers = [];
             padding: 20px;
             max-width: 600px;
             width: 100%;
+            height: 100%;
             box-sizing: border-box;
-            margin-top: 50px;
-            margin-left: auto;
+            margin-top: 46px;
             margin-right: auto;
         }
 
@@ -71,14 +70,15 @@ $followerUsers = [];
         }
     </style>
 </head>
+
 <body>
 
     <div class="user-list-container">
         <h2>User List</h2>
         <div style="text-align: center; margin-bottom: 20px;">
-    <label for="searchUser">Search Users:</label>
-    <input type="text" id="searchUser" oninput="searchUsers()" placeholder="Enter username">
-</div>
+            <label for="searchUser">Search Users:</label>
+            <input type="text" id="searchUser" oninput="searchUsers()" placeholder="Enter username">
+        </div>
 
         <?php
         if ($result && $result->num_rows > 0) {
@@ -91,9 +91,15 @@ $followerUsers = [];
                         <img src="<?php echo $row["AvatarURL"]; ?>" alt="User Avatar">
                     </div>
                     <div class="user-info">
-                        <div><strong>Username:</strong><label class="username"> <?php echo $row["Username"]; ?></label></div>
-                        <div><strong>Email:</strong> <?php echo $row["Email"]; ?></div>
-                        <div><strong>Full Name:</strong> <?php echo $row["FullName"]; ?></div>
+                        <div><strong>Username:</strong><label class="username">
+                                <?php echo $row["Username"]; ?>
+                            </label></div>
+                        <div><strong>Email:</strong>
+                            <?php echo $row["Email"]; ?>
+                        </div>
+                        <div><strong>Full Name:</strong>
+                            <?php echo $row["FullName"]; ?>
+                        </div>
                         <?php
                         if ($isFollowing) {
                             // If already following, show a different button or disable the button
@@ -103,10 +109,11 @@ $followerUsers = [];
                         } else {
                             // If not following, show the regular "Follow" button
                             ?>
-                            <button id="follow-btn-<?php echo $userId; ?>" class="follow-btn" onclick="followUser(<?php echo $userId; ?>)">Follow</button>
+                            <button id="follow-btn-<?php echo $userId; ?>" class="follow-btn"
+                                onclick="followUser(<?php echo $userId; ?>)">Follow</button>
                             <?php
                         }
-                        
+
                         ?>
                     </div>
                 </div>
@@ -120,6 +127,7 @@ $followerUsers = [];
     </div>
 
 </body>
+
 </html>
 <script>
     function followUser(userId) {
@@ -148,24 +156,24 @@ $followerUsers = [];
         };
 
         // Send the request with the user ID
-        xhr.send("userId=" +  encodeURIComponent(userId));
+        xhr.send("userId=" + encodeURIComponent(userId));
     }
     function searchUsers() {
-    var input, filter, userCards, user, username;
-    input = document.getElementById("searchUser");
-    filter = input.value.toUpperCase();
-    userCards = document.querySelectorAll(".user-card");
-    for (var i = 0; i < userCards.length; i++) {
-        user = userCards[i];
-        username = user.querySelector(".username").textContent.toUpperCase();
-        console.log(username.toString().textContent);
-        if (username.indexOf(filter) > -1) {
-            user.style.display = "";
-        } else {
-            user.style.display = "none";
+        var input, filter, userCards, user, username;
+        input = document.getElementById("searchUser");
+        filter = input.value.toUpperCase();
+        userCards = document.querySelectorAll(".user-card");
+        for (var i = 0; i < userCards.length; i++) {
+            user = userCards[i];
+            username = user.querySelector(".username").textContent.toUpperCase();
+            console.log(username.toString().textContent);
+            if (username.indexOf(filter) > -1) {
+                user.style.display = "";
+            } else {
+                user.style.display = "none";
+            }
         }
     }
-}
 
 </script>
 
