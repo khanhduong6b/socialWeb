@@ -79,10 +79,6 @@ if (isset($_SESSION['username'])) {
             display: flex;
             flex-direction: column;
         }
-
-        .chat-btn {
-            margin-top: 10px;
-        }
     </style>
 
 </head>
