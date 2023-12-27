@@ -9,7 +9,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Get the current user's ID from the session
     $currentUser = $_SESSION['user_id'];
     // Check if the current user is not already following the target user
-    $checkFollow = "SELECT * FROM follows WHERE FollowerID = $currentUser AND FollowingID = $userId";
+    $checkFollow = "SELECT * FROM follows WHERE FollowerID = $userId AND FollowingID = $currentUser";
     $result = $conn->query($checkFollow);
 
     if ($result && $result->num_rows > 0) {

@@ -13,7 +13,7 @@ if (isset($_SESSION['username'])) {
     // Fetch the list of users that the logged-in user is already following
     $loggedInUserId = $_SESSION["user_id"];
     try {
-        $followerQuery = "SELECT FollowerID FROM follows WHERE FollowingID = $loggedInUserId";
+        $followerQuery = "SELECT FollowingID FROM follows WHERE FollowerID = $loggedInUserId";
         $followerResult = $conn->query($followerQuery);
         $followerUsers = [];
     } catch (PDOException $e) {
@@ -21,7 +21,7 @@ if (isset($_SESSION['username'])) {
     }
     if ($followerResult && $followerResult->num_rows > 0) {
         while ($followerRow = $followerResult->fetch_assoc()) {
-            $followerUsers[] = $followerRow["FollowerID"];
+            $followerUsers[] = $followerRow["FollowingID"];
         }
     }
 } else {
@@ -45,22 +45,7 @@ if (isset($_SESSION['username'])) {
             padding: 0 20px;
         }
 
-        .box-chat {
-            width: 50%;
-            min-height: 600px;
-            height: 100%;
-            box-sizing: border-box;
-            padding: 20px;
-            margin-left: 3rem;
-            position: -webkit-sticky;
-            position: sticky;
-            bottom: 15px;
-            display: flex;
-            flex-flow: column;
-            border-radius: 16px;
-            border: 1px solid black;
-            box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
-        }
+        
 
         h2 {
             text-align: center;
@@ -88,34 +73,11 @@ if (isset($_SESSION['username'])) {
             flex-direction: column;
         }
 
-        .follow-btn {
+        .chat-btn {
             margin-top: 10px;
         }
 
-        #box-chat--header {
-            height: 60px;
-            width: 100%;
-            background-color: #fff;
-            padding: 8px;
-            border: 1px solid gray;
-            border-radius: 16px;
-        }
-
-        #box-chat--body {
-            margin-top: 10px;
-            height: 100%;
-            width: 100%;
-            padding: 30px;
-            min-height: 480px;
-            background-color: #fff;
-            border: 1px solid gray;
-            border-radius: 16px;
-        }
-
-        .chat-text {
-            border: 1px solid gray;
-
-        }
+     
     </style>
 
 </head>
@@ -136,14 +98,15 @@ if (isset($_SESSION['username'])) {
                 while ($row = $result->fetch_assoc()) {
                     $userId = $row["UserID"];
                     $isFollowing = in_array($userId, $followerUsers);
+                    if ($isFollowing) {
                     ?>
                     <div class="user-card">
                         <div class="user-avatar">
                             <img src="<?php echo $row["AvatarURL"]; ?>" alt="User Avatar">
                         </div>
                         <div class="user-info">
-                            <div><strong>Username:</strong>
-                                <?php echo $row["Username"]; ?>
+                            <div><strong >Username:</strong><span id="username-<?php echo $userId; ?>">
+                                <?php echo $row["Username"]; ?></span>
                             </div>
                             <div><strong>Email:</strong>
                                 <?php echo $row["Email"]; ?>
@@ -151,28 +114,34 @@ if (isset($_SESSION['username'])) {
                             <div><strong>Full Name:</strong>
                                 <?php echo $row["FullName"]; ?>
                             </div>
-                            <button id="follow-btn-<?php echo $userId; ?>" class="follow-btn"
-                                onclick="followUser(<?php echo $userId; ?>)">Chat</button>
+                            <button class="chat-btn"
+                                onclick="ChatUser(<?php echo $userId; ?>)">Chat</button>
                         </div>
                     </div>
-                    <?php
+                    <?php }
                 }
             } else {
                 echo "No users found.";
             }
+            
             ?>
         </div>
-
+            
         <div class="box-chat">
             <div id="box-chat--header">
-                USERNAME
+                <p id="receiverId" hidden></p>
+                <p id="receiver" ></p>
             </div>
-            <div id="box-chat--body">
-                <p class="chat-text">
-                    CONTENT
+            <div id="box-chat--body ">
+                <p id="message">
+                    
                 </p>
             </div>
-
+            
+        <div id="box-chat--input" style="display:  flex;">
+            <input type="text" id="input-message" placeholder="Enter Message">
+            <button class="chat-btn" style="width: 80px" onclick="sendMessage()"> Send</button>
+        </div>
         </div>
     </div>
 </body>
@@ -180,27 +149,26 @@ if (isset($_SESSION['username'])) {
 
 </html>
 <script>
-    function followUser(userId) {
+    function ChatUser(userId) {
+        document.getElementById('receiverId').innerText = userId;
+        document.getElementById('receiver').innerText = document.getElementById('username-'+userId).innerText;
         // Create an XMLHttpRequest object
-        console.log(userId);
         var xhr = new XMLHttpRequest();
 
         // Define the AJAX request
-        xhr.open("POST", "./pages/follow_user.php", true);
+        xhr.open("POST", "./pages/chat.php", true);
         xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
 
-        // Set up a callback function to handle the response
         xhr.onreadystatechange = function () {
             if (xhr.readyState == 4 && xhr.status == 200) {
                 // Handle the response from the server
                 console.log(xhr.responseText);
                 // You can update the UI or perform other actions based on the response
-                if (xhr.responseText === "User followed successfully.") {
+                if (xhr.responseText === "No message available") {
                     // Example: Change button text and disable the button
-                    document.getElementById('follow-btn-' + userId).innerText = "Following";
-                    document.getElementById('follow-btn-' + userId).disabled = true;
+                    
                 } else {
-                    // Handle other response scenarios if needed
+                    document.getElementById('message').innerHTML = xhr.responseText;
                 }
             }
         };
@@ -208,6 +176,62 @@ if (isset($_SESSION['username'])) {
         // Send the request with the user ID
         xhr.send("userId=" + encodeURIComponent(userId));
     }
+
+    function sendMessage() {
+            // Retrieve SenderID and ReceiverID from the page
+            var senderId = <?php echo $loggedInUserId; ?>;
+            var receiverId = document.getElementById('receiverId').innerText;
+            var messageInput = document.getElementById('input-message').value;
+
+            // Create an XMLHttpRequest object
+            var xhr = new XMLHttpRequest();
+
+            // Define the AJAX request
+            xhr.open("POST", "./pages/insert_chat.php", true);
+            xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState == 4 && xhr.status == 200) {
+                    // Handle the response from the server
+                    console.log(xhr.responseText);
+                    // You can update the UI or perform other actions based on the response
+                    if (xhr.responseText === "Message sent successfully") {
+                        // Example: Clear the input field after sending
+                        document.getElementById('input-message').value = '';
+                    }
+                }
+            };
+
+            // Send the request with SenderID, ReceiverID, and the message input
+            xhr.send("receiverId=" + encodeURIComponent(receiverId) +
+                "&message=" + encodeURIComponent(messageInput));
+        }
+
+setInterval(() =>{
+    var xhr = new XMLHttpRequest();
+
+    // Define the AJAX request
+    xhr.open("POST", "./pages/chat.php", true);
+    xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+
+    xhr.onreadystatechange = function () {
+        if (xhr.readyState == 4 && xhr.status == 200) {
+            // Handle the response from the server
+            console.log(xhr.responseText);
+            // You can update the UI or perform other actions based on the response
+            if (xhr.responseText === "No message available") {
+                    // Example: Change button text and disable the button
+                    
+                } else {
+                    document.getElementById('message').innerHTML = xhr.responseText;
+                }
+        }
+    };
+    if (document.getElementById('receiverId').innerText!="")
+    // Send the request with the user ID
+    xhr.send("userId=" + encodeURIComponent(document.getElementById('receiverId').innerText));
+    else console.log("Chua chon nguoi chat")
+}, 500);
 </script>
 
 

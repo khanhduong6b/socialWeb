@@ -94,7 +94,6 @@ span.psw {
 </body>
 </html>
 <?php
-session_start();
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Include your database connection file
     include('../includes/db.php');
@@ -114,8 +113,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Verify the password
         if (password_verify($password, $hashed_password)) {
             echo "User logged in successfully: $username";
-            $_SESSION['username'] = $username;
-            $_SESSION['user_id'] = $row["UserID"];
+            
+            session_start();
+            $_SESSION["username"] = $username;
+            $_SESSION["user_id"] = $row["UserID"];
             // Redirect to another page or perform additional actions
             header("Location: ../index.php");
             exit();
