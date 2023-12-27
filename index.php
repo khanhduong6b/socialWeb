@@ -116,7 +116,7 @@ session_start(); // Start the session
     }
 
     .box-chat {
-      overflow: auto;
+
       width: 50%;
       box-sizing: border-box;
       padding: 20px;
@@ -140,12 +140,14 @@ session_start(); // Start the session
     }
 
     #box-chat--header {
+      min-height: 75px;
       padding: 8px;
       border-radius: 8px;
       border: 1px solid #ddd;
     }
 
     #box-chat--body {
+
       padding: 20px;
       min-height: 200px;
       border-radius: 8px;
@@ -167,6 +169,7 @@ session_start(); // Start the session
 
     /* Style for sender messages */
     .box-chat .sender {
+      float: right;
       text-align: right;
       background-color: #3498db;
       color: #fff;
@@ -174,6 +177,12 @@ session_start(); // Start the session
       margin: 10px 0;
       border-radius: 12px;
       font-size: 14px;
+    }
+
+    .box-chat .sender,
+    .box-chat .receiver {
+      margin-top: 10px;
+      padding: 8px;
     }
 
     /* Style for receiver messages */

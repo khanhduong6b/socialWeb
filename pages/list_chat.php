@@ -74,6 +74,12 @@ if (isset($_SESSION['username'])) {
             object-fit: cover;
         }
 
+        #message {
+
+            display: flex;
+            flex-flow: column;
+        }
+
         .user-info {
             margin-left: 10px;
             display: flex;
@@ -134,9 +140,10 @@ if (isset($_SESSION['username'])) {
                 <p id="receiver"></p>
             </div>
             <div id="box-chat--body ">
-                <p id="message">
-
-                </p>
+                <div style="overflow:auto; height:400px;">
+                    <p id="message">
+                    </p>
+                </div>
             </div>
 
             <div id="box-chat--input" style="display:  flex;">
