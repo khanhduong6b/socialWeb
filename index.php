@@ -116,7 +116,6 @@ session_start(); // Start the session
     }
 
     .box-chat {
-
       width: 50%;
       box-sizing: border-box;
       padding: 20px;
@@ -181,8 +180,9 @@ session_start(); // Start the session
 
     .box-chat .sender,
     .box-chat .receiver {
+      box-sizing: border-box;
       margin-top: 10px;
-      padding: 8px;
+      size: 18px;
     }
 
     /* Style for receiver messages */

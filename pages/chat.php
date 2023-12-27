@@ -13,9 +13,9 @@ if ($result && $result->num_rows > 0) {
 
     echo ' <div style="width:100%">
         <div class="box-chat ' . $messageClass . '">
-                <h1>
+                <p>
                     ' . $row['Content'] . '
-                </h1>
+                </p>
               </div></div>';
   }
 }
