@@ -49,6 +49,11 @@ session_start(); // Start the session
     .w3-main {
       flex: 1;
     }
+
+    .container {
+      height: 85vh;
+
+    }
   </style>
 </head>
 
@@ -97,7 +102,7 @@ session_start(); // Start the session
     id="myOverlay"></div>
 
   <!-- Main content: shift it to the right by 250 pixels when the sidebar is visible -->
-  <div class="w3-main" style="margin-left:250px">
+  <div style="margin-left:250px;height:80vh;">
 
     <?php
     $view = isset($_GET['view']) ? $_GET['view'] : 'home';

@@ -43,6 +43,7 @@ if (isset($_SESSION['username'])) {
             box-sizing: border-box;
             margin-top: 46px;
             margin-right: auto;
+            overflow: auto;
         }
 
         h2 {

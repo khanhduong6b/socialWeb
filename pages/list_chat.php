@@ -40,12 +40,19 @@ if (isset($_SESSION['username'])) {
     <title>User List</title>
     <style>
         .user-list-container {
-            width: 45%;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            max-width: 600px;
+            width: 100%;
+            height: 100%;
             box-sizing: border-box;
-            padding: 0 20px;
+
+            margin-right: auto;
         }
 
-        
+
 
         h2 {
             text-align: center;
@@ -76,14 +83,12 @@ if (isset($_SESSION['username'])) {
         .chat-btn {
             margin-top: 10px;
         }
-
-     
     </style>
 
 </head>
 
 <body>
-    <div style="display:flex;width:100%;height:100%;margin-top:46px;align-items:flex-end;">
+    <div class="w3-main" style="display:flex;width:100%;height:100%;margin-top:46px;align-items:flex-end;">
         <div class="user-list-container">
             <h2>User List</h2>
             <form method="GET" action="find_users.php">
@@ -99,49 +104,49 @@ if (isset($_SESSION['username'])) {
                     $userId = $row["UserID"];
                     $isFollowing = in_array($userId, $followerUsers);
                     if ($isFollowing) {
-                    ?>
-                    <div class="user-card">
-                        <div class="user-avatar">
-                            <img src="<?php echo $row["AvatarURL"]; ?>" alt="User Avatar">
+                        ?>
+                        <div class="user-card">
+                            <div class="user-avatar">
+                                <img src="<?php echo $row["AvatarURL"]; ?>" alt="User Avatar">
+                            </div>
+                            <div class="user-info">
+                                <div><strong>Username:</strong><span id="username-<?php echo $userId; ?>">
+                                        <?php echo $row["Username"]; ?>
+                                    </span>
+                                </div>
+                                <div><strong>Email:</strong>
+                                    <?php echo $row["Email"]; ?>
+                                </div>
+                                <div><strong>Full Name:</strong>
+                                    <?php echo $row["FullName"]; ?>
+                                </div>
+                                <button class="chat-btn" onclick="ChatUser(<?php echo $userId; ?>)">Chat</button>
+                            </div>
                         </div>
-                        <div class="user-info">
-                            <div><strong >Username:</strong><span id="username-<?php echo $userId; ?>">
-                                <?php echo $row["Username"]; ?></span>
-                            </div>
-                            <div><strong>Email:</strong>
-                                <?php echo $row["Email"]; ?>
-                            </div>
-                            <div><strong>Full Name:</strong>
-                                <?php echo $row["FullName"]; ?>
-                            </div>
-                            <button class="chat-btn"
-                                onclick="ChatUser(<?php echo $userId; ?>)">Chat</button>
-                        </div>
-                    </div>
                     <?php }
                 }
             } else {
                 echo "No users found.";
             }
-            
+
             ?>
         </div>
-            
+
         <div class="box-chat">
             <div id="box-chat--header">
                 <p id="receiverId" hidden></p>
-                <p id="receiver" ></p>
+                <p id="receiver"></p>
             </div>
             <div id="box-chat--body ">
                 <p id="message">
-                    
+
                 </p>
             </div>
-            
-        <div id="box-chat--input" style="display:  flex;">
-            <input type="text" id="input-message" placeholder="Enter Message">
-            <button class="chat-btn" style="width: 80px" onclick="sendMessage()"> Send</button>
-        </div>
+
+            <div id="box-chat--input" style="display:  flex;">
+                <input type="text" id="input-message" placeholder="Enter Message">
+                <button class="chat-btn" style="width: 80px" onclick="sendMessage()"> Send</button>
+            </div>
         </div>
     </div>
 </body>
@@ -151,7 +156,7 @@ if (isset($_SESSION['username'])) {
 <script>
     function ChatUser(userId) {
         document.getElementById('receiverId').innerText = userId;
-        document.getElementById('receiver').innerText = document.getElementById('username-'+userId).innerText;
+        document.getElementById('receiver').innerText = document.getElementById('username-' + userId).innerText;
         // Create an XMLHttpRequest object
         var xhr = new XMLHttpRequest();
 
@@ -166,7 +171,7 @@ if (isset($_SESSION['username'])) {
                 // You can update the UI or perform other actions based on the response
                 if (xhr.responseText === "No message available") {
                     // Example: Change button text and disable the button
-                    
+
                 } else {
                     document.getElementById('message').innerHTML = xhr.responseText;
                 }
@@ -178,60 +183,60 @@ if (isset($_SESSION['username'])) {
     }
 
     function sendMessage() {
-            // Retrieve SenderID and ReceiverID from the page
-            var senderId = <?php echo $loggedInUserId; ?>;
-            var receiverId = document.getElementById('receiverId').innerText;
-            var messageInput = document.getElementById('input-message').value;
+        // Retrieve SenderID and ReceiverID from the page
+        var senderId = <?php echo $loggedInUserId; ?>;
+        var receiverId = document.getElementById('receiverId').innerText;
+        var messageInput = document.getElementById('input-message').value;
 
-            // Create an XMLHttpRequest object
-            var xhr = new XMLHttpRequest();
+        // Create an XMLHttpRequest object
+        var xhr = new XMLHttpRequest();
 
-            // Define the AJAX request
-            xhr.open("POST", "./pages/insert_chat.php", true);
-            xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        // Define the AJAX request
+        xhr.open("POST", "./pages/insert_chat.php", true);
+        xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
 
-            xhr.onreadystatechange = function () {
-                if (xhr.readyState == 4 && xhr.status == 200) {
-                    // Handle the response from the server
-                    console.log(xhr.responseText);
-                    // You can update the UI or perform other actions based on the response
-                    if (xhr.responseText === "Message sent successfully") {
-                        // Example: Clear the input field after sending
-                        document.getElementById('input-message').value = '';
-                    }
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState == 4 && xhr.status == 200) {
+                // Handle the response from the server
+                console.log(xhr.responseText);
+                // You can update the UI or perform other actions based on the response
+                if (xhr.responseText === "Message sent successfully") {
+                    // Example: Clear the input field after sending
+                    document.getElementById('input-message').value = '';
                 }
-            };
+            }
+        };
 
-            // Send the request with SenderID, ReceiverID, and the message input
-            xhr.send("receiverId=" + encodeURIComponent(receiverId) +
-                "&message=" + encodeURIComponent(messageInput));
-        }
+        // Send the request with SenderID, ReceiverID, and the message input
+        xhr.send("receiverId=" + encodeURIComponent(receiverId) +
+            "&message=" + encodeURIComponent(messageInput));
+    }
 
-setInterval(() =>{
-    var xhr = new XMLHttpRequest();
+    setInterval(() => {
+        var xhr = new XMLHttpRequest();
 
-    // Define the AJAX request
-    xhr.open("POST", "./pages/chat.php", true);
-    xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        // Define the AJAX request
+        xhr.open("POST", "./pages/chat.php", true);
+        xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
 
-    xhr.onreadystatechange = function () {
-        if (xhr.readyState == 4 && xhr.status == 200) {
-            // Handle the response from the server
-            console.log(xhr.responseText);
-            // You can update the UI or perform other actions based on the response
-            if (xhr.responseText === "No message available") {
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState == 4 && xhr.status == 200) {
+                // Handle the response from the server
+                console.log(xhr.responseText);
+                // You can update the UI or perform other actions based on the response
+                if (xhr.responseText === "No message available") {
                     // Example: Change button text and disable the button
-                    
+
                 } else {
                     document.getElementById('message').innerHTML = xhr.responseText;
                 }
-        }
-    };
-    if (document.getElementById('receiverId').innerText!="")
-    // Send the request with the user ID
-    xhr.send("userId=" + encodeURIComponent(document.getElementById('receiverId').innerText));
-    else console.log("Chua chon nguoi chat")
-}, 500);
+            }
+        };
+        if (document.getElementById('receiverId').innerText != "")
+            // Send the request with the user ID
+            xhr.send("userId=" + encodeURIComponent(document.getElementById('receiverId').innerText));
+        else console.log("Chua chon nguoi chat")
+    }, 500);
 </script>
 
 
